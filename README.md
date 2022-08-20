@@ -46,7 +46,7 @@ To clone and run this application, you'll need:
     http://www.localhost:8099/actuator/health
 
 ## Test data
-![test-data.png](test_data.png)
+![test-data.png](image/test_data.png)
 
 ## Expected reward points result
 Name | December | January | February | March | April| Total |
