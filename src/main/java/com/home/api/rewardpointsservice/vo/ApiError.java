@@ -1,6 +1,5 @@
 package com.home.api.rewardpointsservice.vo;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,8 +12,6 @@ import org.springframework.http.HttpStatus;
 @Builder
 public class ApiError
 {
-    @JsonProperty
     private HttpStatus status;
-    @JsonProperty
     private String message;
 }

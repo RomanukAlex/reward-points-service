@@ -4,11 +4,13 @@ import com.home.api.rewardpointsservice.entity.Transaction;
 import com.home.api.rewardpointsservice.exeption.TransactionNotFoundException;
 import com.home.api.rewardpointsservice.mapper.TransactionMapper;
 import com.home.api.rewardpointsservice.repositories.RewardPointRepository;
+import com.home.api.rewardpointsservice.util.LanguageValidator;
+import com.home.api.rewardpointsservice.util.MessageHelper;
 import com.home.api.rewardpointsservice.vo.CustomerRewardPointsInfoVO;
-import com.home.api.rewardpointsservice.vo.CustomerRewardInfoVO;
 import com.home.api.rewardpointsservice.vo.RewardPointVO;
 import com.home.api.rewardpointsservice.vo.TransactionVO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,33 +28,40 @@ import static java.util.stream.Collectors.groupingBy;
 @Service
 @RequiredArgsConstructor
 @Transactional( readOnly = true )
+@Slf4j
 public class RewardPointServiceImpl implements RewardPointService
 {
     private final RewardPointRepository rewardPointRepository;
     private final TransactionMapper mapper;
+    private final LanguageValidator languageValidator;
 
     @Value( "${reward.point.over.50}" )
     private Integer countOfPointOver50;
     @Value( "${reward.point.over.100}" )
     private Integer countOfPointOver100;
+    private final String rewardPointsPerMonthMessageCode = "message.number.reward.points.per.month";
+    private final String totalRewardPointsMessageCode = "message.total.number.reward.points";
 
     @Override
-    public List<CustomerRewardPointsInfoVO> getCustomerRewardPointsInfo()
+    public List<CustomerRewardPointsInfoVO> getCustomerRewardPointsInfo( final String language )
     {
-        List<Transaction> transactions = rewardPointRepository.findAll();
+        languageValidator.validate( language );
+
+        final List<Transaction> transactions = rewardPointRepository.findAll();
         if( transactions.isEmpty() )
         {
+            log.error( "No transactions found." );
             throw new TransactionNotFoundException();
         }
 
-        List<TransactionVO> transactionsVO = mapper.convertToListTransactionVO( transactions );
+        final List<TransactionVO> transactionsVO = mapper.convertToListTransactionVO( transactions );
 
-        Map<String, HashMap<Month, Double>> groupingMap = groupingByCustomerNameAndMonth( transactionsVO );
+        final Map<String, HashMap<Month, Double>> groupingMap = groupingByCustomerNameAndMonth( transactionsVO );
 
         return prepareCustomerRewardPointsInfoResponse( groupingMap );
     }
 
-    private Map<String, HashMap<Month, Double>> groupingByCustomerNameAndMonth( List<TransactionVO> transactionsVO )
+    private Map<String, HashMap<Month, Double>> groupingByCustomerNameAndMonth( final List<TransactionVO> transactionsVO )
     {
         return transactionsVO.stream()
                              .collect(
@@ -63,24 +72,24 @@ public class RewardPointServiceImpl implements RewardPointService
                                          ) ) ) ) );
     }
 
-    private List<CustomerRewardPointsInfoVO> prepareCustomerRewardPointsInfoResponse( Map<String, HashMap<Month, Double>> groupingMap )
+    private List<CustomerRewardPointsInfoVO> prepareCustomerRewardPointsInfoResponse( final Map<String, HashMap<Month, Double>> groupingMap )
     {
         return groupingMap.entrySet().stream().map( entry -> {
-            CustomerRewardPointsInfoVO customerVO = new CustomerRewardPointsInfoVO();
+            final CustomerRewardPointsInfoVO customerVO = new CustomerRewardPointsInfoVO();
             customerVO.setCustomerName( entry.getKey() );
 
-            List<RewardPointVO> rewardPoints = new ArrayList<>();
+            final List<RewardPointVO> rewardPoints = new ArrayList<>();
             AtomicReference<Double> totalRewardPoints = new AtomicReference<>( 0.0 );
             List<RewardPointVO> rewardPointsVO = prepareRewardPointsByMonth( entry.getValue(), rewardPoints, totalRewardPoints );
 
             customerVO.setRewardPoints( rewardPointsVO );
-            customerVO.setTotalRewardPoints( totalRewardPoints );
+            customerVO.setTotalRewardPoints( MessageHelper.getMessage( totalRewardPointsMessageCode, new Object[] { totalRewardPoints } ) );
             return customerVO;
 
         } ).collect( Collectors.toList() );
     }
 
-    private Double calculateRewardPoints( TransactionVO transaction )
+    private Double calculateRewardPoints( final TransactionVO transaction )
     {
         Double price = transaction.getPrice();
         if( price <= 50 )
@@ -100,8 +109,11 @@ public class RewardPointServiceImpl implements RewardPointService
     private List<RewardPointVO> prepareRewardPointsByMonth( Map<Month, Double> map, List<RewardPointVO> rewardPoints, AtomicReference<Double> totalRewardPoints )
     {
         return map.entrySet().stream().map( entrySet -> {
+            final Month month = entrySet.getKey();
+            final RewardPointVO rewardPointVO = new RewardPointVO(
+                MessageHelper.getMessage( month.toString(), null ),
+                MessageHelper.getMessage( rewardPointsPerMonthMessageCode, new Object[] { entrySet.getValue() } ) );
 
-            RewardPointVO rewardPointVO = new RewardPointVO( entrySet.getKey(), entrySet.getValue() );
             rewardPoints.add( rewardPointVO );
             totalRewardPoints.updateAndGet( value -> value + entrySet.getValue() );
 

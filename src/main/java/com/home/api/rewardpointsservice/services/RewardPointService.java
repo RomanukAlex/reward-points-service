@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface RewardPointService
 {
-    List<CustomerRewardPointsInfoVO> getCustomerRewardPointsInfo();
+    List<CustomerRewardPointsInfoVO> getCustomerRewardPointsInfo( final String language );
 }
