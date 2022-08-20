@@ -6,8 +6,8 @@ public class TransactionNotFoundException extends RuntimeException
 {
     private static final String ERROR_CODE = "message.error.transaction.not.found";
 
-    public TransactionNotFoundException()
+    public TransactionNotFoundException( final MessageHelper messageHelper )
     {
-        super( MessageHelper.getMessage( ERROR_CODE, null ) );
+        super( messageHelper.getMessage( ERROR_CODE, null ) );
     }
 }

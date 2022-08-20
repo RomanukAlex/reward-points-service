@@ -34,13 +34,13 @@ public class RewardPointServiceImpl implements RewardPointService
     private final RewardPointRepository rewardPointRepository;
     private final TransactionMapper mapper;
     private final LanguageValidator languageValidator;
-
-    @Value( "${reward.point.over.50}" )
-    private Integer countOfPointOver50;
-    @Value( "${reward.point.over.100}" )
-    private Integer countOfPointOver100;
+    private final MessageHelper messageHelper;
     private final String rewardPointsPerMonthMessageCode = "message.number.reward.points.per.month";
     private final String totalRewardPointsMessageCode = "message.total.number.reward.points";
+    @Value( "${reward.point.over.50}" )
+    private Double countOfPointOver50;
+    @Value( "${reward.point.over.100}" )
+    private Double countOfPointOver100;
 
     @Override
     public List<CustomerRewardPointsInfoVO> getCustomerRewardPointsInfo( final String language )
@@ -51,7 +51,7 @@ public class RewardPointServiceImpl implements RewardPointService
         if( transactions.isEmpty() )
         {
             log.error( "No transactions found." );
-            throw new TransactionNotFoundException();
+            throw new TransactionNotFoundException( messageHelper );
         }
 
         final List<TransactionVO> transactionsVO = mapper.convertToListTransactionVO( transactions );
@@ -83,7 +83,7 @@ public class RewardPointServiceImpl implements RewardPointService
             List<RewardPointVO> rewardPointsVO = prepareRewardPointsByMonth( entry.getValue(), rewardPoints, totalRewardPoints );
 
             customerVO.setRewardPoints( rewardPointsVO );
-            customerVO.setTotalRewardPoints( MessageHelper.getMessage( totalRewardPointsMessageCode, new Object[] { totalRewardPoints } ) );
+            customerVO.setTotalRewardPoints( messageHelper.getMessage( totalRewardPointsMessageCode, new Object[] { totalRewardPoints } ) );
             return customerVO;
 
         } ).collect( Collectors.toList() );
@@ -111,8 +111,8 @@ public class RewardPointServiceImpl implements RewardPointService
         return map.entrySet().stream().map( entrySet -> {
             final Month month = entrySet.getKey();
             final RewardPointVO rewardPointVO = new RewardPointVO(
-                MessageHelper.getMessage( month.toString(), null ),
-                MessageHelper.getMessage( rewardPointsPerMonthMessageCode, new Object[] { entrySet.getValue() } ) );
+                messageHelper.getMessage( month.toString(), null ),
+                messageHelper.getMessage( rewardPointsPerMonthMessageCode, new Object[] { entrySet.getValue() } ) );
 
             rewardPoints.add( rewardPointVO );
             totalRewardPoints.updateAndGet( value -> value + entrySet.getValue() );

@@ -1,0 +1,15 @@
+INSERT INTO transaction (transaction_name, customer_name, date_create, price)
+VALUES ('transaction1', 'Alex', '2021-12-12', 101.0),
+       ('transaction2', 'Alex', '2021-12-15', 101.0),
+       ('transaction3', 'Alex', '2021-12-20', 101.0),
+       ('transaction4', 'Alex', '2022-01-05', 20.0),
+       ('transaction5', 'Alex', '2022-01-10', 30.0),
+       ('transaction6', 'Alex', '2022-01-10', 40.0),
+       ('transaction7', 'Alex', '2022-02-10', 51.0),
+       ('transaction8', 'Alex', '2022-02-11', 51.0),
+       ('transaction9', 'Nick', '2022-02-11', 120.0),
+       ('transaction10', 'Nick', '2022-03-11', 120.0),
+       ('transaction11', 'Nick', '2022-04-11', 120.0),
+       ('transaction12', 'Mike', '2022-02-11', 21.0),
+       ('transaction13', 'Mike', '2022-03-11', 51.0),
+       ('transaction14', 'Mike', '2022-04-11', 101.0);
