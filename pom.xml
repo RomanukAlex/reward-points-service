@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.home.api</groupId>
 	<artifactId>reward-points-service</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>reward-points-service</name>
 	<description>Calculate the reward points</description>
 	<properties>

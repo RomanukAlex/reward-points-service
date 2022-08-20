@@ -6,6 +6,7 @@
 * [Health check](#health-check)
 * [Test data](#test-data)
 * [Expected result](#expected-result)
+* [Docker](#docker)
 
 ## General info
 Test task
@@ -54,3 +55,24 @@ Name | December | January | February | March | April| Total |
 Alex | 156 | 0 | 2 |   |   | 158 |
 Mike |   |   | 0 | 1 | 52 | 53 |
 Nick |   |   | 90 | 90 | 90 | 270 |
+
+## Docker
+- Download project from github URL:
+
+      git clone https://github.com/RomanukAlex/reward-points-service.git
+
+- Go into the repository:
+
+      cd reward-points-service
+
+- Build project
+
+      mvn clean package
+
+- Build docker image
+
+      docker build -t test-task/calculate-reward-points .
+
+- Run docker container
+
+      docker run -p 8099:8099 test/reward-points-docker
