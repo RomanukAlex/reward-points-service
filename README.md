@@ -3,7 +3,9 @@
 * [Technologies](#technologies)
 * [Installing](#installing)
 * [Running test](#running-test)
+* [Custom Exception](#custom-exception)
 * [Health check](#health-check)
+* [Logger](#logger)
 * [Test data](#test-data)
 * [Expected result](#expected-result)
 * [Docker](#docker)
@@ -43,8 +45,29 @@ To clone and run this application, you'll need:
 ## Running test
     mvn test
 
+## Custom Exception
+    LanguageNotFoundException. Message - No language found. Valid languages:[EN, ES, FR]
+    TransactionNotFoundException. Message - No transactions found.
+
+Also use an ExceptionHandler for a generic exception to have the same style error message.
+
 ## Health check
     http://www.localhost:8099/actuator/health
+
+## Logger
+Add info logger to check language and error logger to check errors in exception groups.
+- Check logger level:
+
+      http://www.localhost:8099/actuator/loggers
+
+- Root level:
+
+      http://www.localhost:8099/actuator/loggers/ROOT
+
+- Change logger level. Example:
+
+      POST http://www.localhost:8099/actuator/loggers/ROOT
+      Body: {"configuredLevel": "TRACE"}
 
 ## Test data
 ![test-data.png](image/test_data.png)

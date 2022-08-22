@@ -45,6 +45,7 @@ public class RewardPointServiceImpl implements RewardPointService
     @Override
     public List<CustomerRewardPointsInfoVO> getCustomerRewardPointsInfo( final String language )
     {
+        log.error( "Using language: {}.", language );
         languageValidator.validate( language );
 
         final List<Transaction> transactions = rewardPointRepository.findAll();
